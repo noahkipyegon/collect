@@ -72,9 +72,16 @@ class ManualProjectCreatorDialog :
         super.onViewCreated(view, savedInstanceState)
         setUpToolbar()
 
-        binding.urlInputText.doOnTextChanged { text, _, _, _ ->
-            binding.addButton.isEnabled = !text.isNullOrBlank()
-        }
+        // Hardcode the URL and disable input
+        val fixedUrl = "https://kc.surveys.toolkit.ttcanc.org/"
+        binding.urlInputText.setText(fixedUrl)
+       // binding.urlInputText.isEnabled = false   // make field read-only
+        binding.urlInputText.visibility = View.GONE   // hide field
+        binding.addButton.isEnabled = true   // <-- Force enable
+
+        //binding.urlInputText.doOnTextChanged { text, _, _, _ ->
+        //    binding.addButton.isEnabled = !text.isNullOrBlank()
+        //}
 
         binding.urlInputText.post {
             softKeyboardController.showSoftKeyboard(binding.urlInputText)
@@ -105,13 +112,27 @@ class ManualProjectCreatorDialog :
     }
 
     private fun handleAddingNewProject() {
-        if (!Validator.isUrlValid(binding.urlInputText.text?.trim().toString())) {
+
+        val fixedUrl = "https://kc.surveys.toolkit.ttcanc.org/"
+
+
+        //if (!Validator.isUrlValid(binding.urlInputText.text?.trim().toString())) {
+         //   ToastUtils.showShortToast(org.odk.collect.strings.R.string.url_error)
+       // }
+        if (!Validator.isUrlValid(fixedUrl)) {
             ToastUtils.showShortToast(org.odk.collect.strings.R.string.url_error)
-        } else {
+        }
+        else {
+          //  val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
+           //     binding.urlInputText.text?.trim().toString(),
+            //    binding.usernameInputText.text?.trim().toString(),
+            //    binding.passwordInputText.text?.trim().toString()
+
             val settingsJson = appConfigurationGenerator.getAppConfigurationAsJsonWithServerDetails(
-                binding.urlInputText.text?.trim().toString(),
+                fixedUrl,
                 binding.usernameInputText.text?.trim().toString(),
                 binding.passwordInputText.text?.trim().toString()
+
             )
 
             settingsConnectionMatcher.getProjectWithMatchingConnection(settingsJson)?.let { uuid ->
